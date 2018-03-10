@@ -77,6 +77,17 @@ public class ServerThread extends Thread
         {
             //Send the initial response
             initialResponse();
+            
+            //Print to text file
+            FileWriter out = null;
+    		try {
+    			out = new FileWriter("/tmp/store/test.txt");
+    			out.write(name + ",1");
+    		} finally {
+    			if (out != null) {
+    				out.close();
+    			}
+    		}
 
             //Create the stream readers for the client
             InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8);
