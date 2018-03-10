@@ -49,7 +49,6 @@ public class WebClient extends HttpServlet {
 				line = br.readLine();
 			}
 			br.close();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -91,6 +90,16 @@ public class WebClient extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
+	}
+	
+	public static void checkAllClients() {
+		for(Client cl:WebClient.clientList) {
+			if(cl.getLastOn().getTime()+2*60*1000 < System.currentTimeMillis()) {
+				cl.setStatus(0);
+			} else {
+				cl.setStatus(1);
+			}
+		}
 	}
 
 }
