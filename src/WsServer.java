@@ -1,10 +1,6 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.servlet.ServletOutputStream;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -14,21 +10,26 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint("/websocketendpoint")
 public class WsServer {
 	
+	public String machineName="";
+	
 	@OnOpen
 	public void onOpen(){
 		System.out.println("Open Connection ...");
+		this.writeToTestFile("Open  connection...");
 	}
 	
 	@OnClose
 	public void onClose(){
-		System.out.println("Close Connection ...");
+		System.out.println("Close Connection ... "+machineName);
+		this.writeToTestFile("Close connection..." + machineName);
 	}
 	
 	@OnMessage
 	public String onMessage(String machineName) throws IOException{
+		this.machineName=machineName;
 		System.out.println("Message from the client: " + machineName);
-		//machineStateWrite(machineName, 1);
-		WebClient.clientList;
+		Client cl = WebClient.getClientByName(machineName);
+		cl.setStatus(1);
 		String echoMsg = "Echo from the server : " + machineName;
 		return echoMsg;
 	}
@@ -38,8 +39,8 @@ public class WsServer {
 		e.printStackTrace();
 	}
 	
-	private void machineStateWrite(String machineName, int state) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader("/tmp/store/test.txt"));
+	private void writeToTestFile(String text) {
+		/*BufferedReader br = new BufferedReader(new FileReader("/tmp/store/test.txt"));
 		String contents = "";
 		try {
 			StringBuilder sb = new StringBuilder();
@@ -57,18 +58,18 @@ public class WsServer {
 
 		} finally {
 			br.close();
-		}
+		}*/
 		
         //Print to text file
         FileWriter out = null;
 		try {
-			out = new FileWriter("/tmp/store/test.txt");
-			
-			out.write(contents);
-		} finally {
+			out = new FileWriter("/tmp/store/test.txt", true);
+			out.write(text);
 			if (out != null) {
 				out.close();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

@@ -28,57 +28,57 @@ public class WebClient extends HttpServlet {
 	}
 
 	public void init(ServletConfig config) throws ServletException {
-	    super.init(config);
-	    BufferedReader br;
-	    String everything;
+		super.init(config);
+		BufferedReader br;
+		String everything;
 		try {
 			br = new BufferedReader(new FileReader("/tmp/store/clientlist.txt"));
 			String line = br.readLine();
 
 			while (line != null) {
 				String[] words = line.split(",");
-				Client cl = new Client();
-				cl.setId(Integer.valueOf(words[0]));
-				cl.setMachineName(words[1]);
-				long t = Integer.valueOf(words[2]);
-				cl.setLastOn(new java.util.Date(t));
+				if (words.length > 2) {
+					Client cl = new Client();
+					cl.setId(Integer.valueOf(words[0]));
+					cl.setMachineName(words[1]);
+					long t = Integer.valueOf(words[2]);
+					cl.setLastOn(new java.util.Date(t));
+					cl.createLogFile();
+					clientList.add(cl);
+				}
 				line = br.readLine();
 			}
 			br.close();
 
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	  }
+	}
 	
+	public static Client getClientByName(String machineName) {
+		for(Client cl:WebClient.clientList) {
+			if(cl.getMachineName()==machineName) {
+				return cl;
+			}
+		}
+		return null;
+	}
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
-	
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		BufferedReader br = new BufferedReader(new FileReader("/tmp/store/test.txt"));
-
-		try {
-			StringBuilder sb = new StringBuilder();
-			String line = br.readLine();
-
-			while (line != null) {
-				sb.append(line);
-				sb.append(System.lineSeparator());
-				line = br.readLine();
-			}
-			String everything = sb.toString();
-
+		String s = "";
+		
+		for(Client cl:WebClient.clientList) {
+			s+= cl.toString() + System.lineSeparator();
+		}
 			response.setContentType("text/plain;charset=UTF-8");
 
 			ServletOutputStream sout = response.getOutputStream();
-			sout.print(everything);
-		} finally {
-			br.close();
-		}
+			sout.print(s);
 
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
 	}

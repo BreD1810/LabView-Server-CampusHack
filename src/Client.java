@@ -4,6 +4,7 @@ public class Client {
 	private int id;
 	private String machineName;
 	private Date lastOn;
+	private int status;
 	
 	public Client() {
 	}
@@ -37,11 +38,24 @@ public class Client {
 		return "";
 	}
 	
-	public void createLog() {
+	public void createLogFile() {
 		
 	}
 	
 	public void writeLog(String log) {
 		
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	
+	@Override
+	public String toString() {
+		return id+","+machineName+","+status+","+lastOn;	
 	}
 }
