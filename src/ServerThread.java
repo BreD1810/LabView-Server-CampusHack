@@ -33,9 +33,9 @@ public class ServerThread extends Thread
             {
                 String line = scr.nextLine();
 
-                if(line.contains("PC Name:"))
+                if(line.contains("<MachineName>"))
                 {
-                    name = line.replace("PC Name: ", "");
+                    name = line.replace("<MachineName>", "");
                 }
                 System.out.println(line);
             }
@@ -98,6 +98,7 @@ public class ServerThread extends Thread
         catch (SocketException se)
         {
             //TODO: Add functionality for when the socket is ended.
+            System.out.println("Client " + name + " has terminated.");
         }
         catch(IOException ioe)
         {
