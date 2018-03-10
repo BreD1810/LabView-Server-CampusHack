@@ -1,13 +1,14 @@
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class ServerThread extends Thread
 {
 
-    Socket clientSocket;
+    private Socket clientSocket;
+    private String name;
 
     public ServerThread(Socket clientSocket)
     {
@@ -19,10 +20,32 @@ public class ServerThread extends Thread
     /**
      * The initial response when the connection is made.
      */
-    private void initialResponse()
+    private void initialResponse() throws IOException
     {
+        System.out.println("Begin initial response");
+        //Get the name from the client
+        InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8);
+        Scanner scr = new Scanner(isr);
+        Boolean test = true;
+        while(test)
+        {
+            if(scr.hasNext())
+            {
+                String line = scr.nextLine();
+
+                if(line.contains("PC Name:"))
+                {
+                    name = line.replace("PC Name: ", "");
+                }
+                System.out.println(line);
+            }
+            test = false;
+        }
+
+        //Send the receipt to the client
         System.out.println("Sending initial response");
         sendMessage("Received");
+        System.out.println("sent");
     }
 
     /**
@@ -33,8 +56,8 @@ public class ServerThread extends Thread
     {
         try
         {
-            DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
-            outputStream.writeUTF(message);
+            DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
+            outputStream.writeBytes(message);
         }
         catch(IOException ioe)
         {
@@ -56,19 +79,9 @@ public class ServerThread extends Thread
             initialResponse();
 
             //Create the stream readers for the client
-            InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream());
+            InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8);
             BufferedReader reader = new BufferedReader(isr);
-
-//            //Loop infinitely to listen for messages.
-//            while (true)
-//            {
-//                String line = reader.readLine();
-//                while(!line.isEmpty())
-//                {
-//                    System.out.println(line);
-//                    line = reader.readLine();
-//                }
-//            }
+            //TODO: Figure out scanners
 
             //Temp infinite loop until we figure out a way to detect timeout
             while(true)
@@ -82,9 +95,14 @@ public class ServerThread extends Thread
             }
 
         }
+        catch (SocketException se)
+        {
+            //TODO: Add functionality for when the socket is ended.
+        }
         catch(IOException ioe)
         {
             System.err.println("IOException.");
+            System.out.println("Crashed");
         }
     }
 

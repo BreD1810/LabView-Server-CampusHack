@@ -6,18 +6,14 @@ import java.util.ArrayList;
 public class Server
 {
 
-    ServerSocket serverSocket;
-    Socket connection;
-    static ArrayList<Thread> threads = new ArrayList<Thread>();
-
-
+    private ServerSocket serverSocket;
+    private Socket connection;
 
     public static void main(String[] args) throws IOException
     {
         //Establish the server host
-        //Server serverObj = new Server(new Socket());
         Server serverObj = new Server();
-        serverObj.serverSocket = new ServerSocket(8080);
+        serverObj.serverSocket = new ServerSocket(1337);
 
         //Infinite loop to accept multiple clients
         while(true)
@@ -25,14 +21,11 @@ public class Server
             //Wait for a connecting client
             System.out.println("Waiting for client connection.");
             serverObj.connection = serverObj.serverSocket.accept();
-
             System.out.println("Got client");
+
             //Start a new thread to listen to the client
             ServerThread thread = new ServerThread(serverObj.connection);
             thread.start();
-
-            //Add the thread to the thread list
-            threads.add(thread);
         }
 
     }
