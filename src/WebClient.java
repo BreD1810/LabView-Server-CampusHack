@@ -1,7 +1,9 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "/clientlist", urlPatterns = "/clientlist", loadOnStartup = 1, description = "/clientlist")
 public class WebClient extends HttpServlet {
+	public static ArrayList<Client> clientList = new ArrayList<Client>();
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -24,10 +27,35 @@ public class WebClient extends HttpServlet {
 		// TODO Auto-generated constructor stub
 	}
 
+	public void init(ServletConfig config) throws ServletException {
+	    super.init(config);
+	    BufferedReader br;
+	    String everything;
+		try {
+			br = new BufferedReader(new FileReader("/tmp/store/clientlist.txt"));
+			String line = br.readLine();
+
+			while (line != null) {
+				String[] words = line.split(",");
+				Client cl = new Client();
+				cl.setId(Integer.valueOf(words[0]));
+				cl.setMachineName(words[1]);
+				long t = Integer.valueOf(words[2]);
+				cl.setLastOn(new java.util.Date(t));
+				line = br.readLine();
+			}
+			br.close();
+
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	  }
+	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
