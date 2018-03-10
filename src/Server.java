@@ -1,4 +1,3 @@
-import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,9 +10,7 @@ public class Server
     Socket connection;
     static ArrayList<Thread> threads = new ArrayList<Thread>();
 
-//    public Server(Socket clientSocket) {
-//        this.connection = clientSocket;
-//    }
+
 
     public static void main(String[] args) throws IOException
     {
@@ -29,6 +26,7 @@ public class Server
             System.out.println("Waiting for client connection.");
             serverObj.connection = serverObj.serverSocket.accept();
 
+            System.out.println("Got client");
             //Start a new thread to listen to the client
             ServerThread thread = new ServerThread(serverObj.connection);
             thread.start();
