@@ -1,6 +1,10 @@
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import javax.servlet.ServletConfig;
@@ -30,7 +34,6 @@ public class WebClient extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		BufferedReader br;
-		String everything;
 		try {
 			br = new BufferedReader(new FileReader("/tmp/store/clientlist.txt"));
 			String line = br.readLine();
@@ -41,27 +44,39 @@ public class WebClient extends HttpServlet {
 					Client cl = new Client();
 					cl.setId(Integer.valueOf(words[0]));
 					cl.setMachineName(words[1]);
-					long t = Integer.valueOf(words[2]);
-					cl.setLastOn(new java.util.Date(t));
+					cl.setStatus(Integer.valueOf(words[2]));
+					long t = Integer.valueOf(words[3])*1000;
+					cl.setLastOn(t);
 					cl.createLogFile();
-					clientList.add(cl);
+					WebClient.clientList.add(cl);
 				}
 				line = br.readLine();
 			}
 			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			WebClient.writeToTestFile(e + "\n");
+			WebClient.writeToErrorLog(e);
 		}
 	}
-	
+
+	public static String logArrayList() {
+		String s = "";
+		for (Client cl : WebClient.clientList) {
+			s += cl.toString() + "\n";
+		}
+		return s;
+	}
+
 	public static Client getClientByName(String machineName) {
-		for(Client cl:WebClient.clientList) {
-			if(cl.getMachineName()==machineName) {
+		for (Client cl : WebClient.clientList) {
+			if (cl.getMachineName().equals(machineName)) {
 				return cl;
 			}
 		}
 		return null;
 	}
+
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
@@ -70,14 +85,15 @@ public class WebClient extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String s = "";
-		
-		for(Client cl:WebClient.clientList) {
-			s+= cl.toString() + System.lineSeparator();
+		if (!WebClient.clientList.isEmpty()) {
+			for (Client cl : WebClient.clientList) {
+				s += cl.toString() + System.lineSeparator();
+			}
 		}
-			response.setContentType("text/plain;charset=UTF-8");
+		response.setContentType("text/plain;charset=UTF-8");
 
-			ServletOutputStream sout = response.getOutputStream();
-			sout.print(s);
+		ServletOutputStream sout = response.getOutputStream();
+		sout.print(s);
 
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
@@ -91,15 +107,29 @@ public class WebClient extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-	
-	public static void checkAllClients() {
-		for(Client cl:WebClient.clientList) {
-			if(cl.getLastOn().getTime()+2*60*1000 < System.currentTimeMillis()) {
-				cl.setStatus(0);
-			} else {
-				cl.setStatus(1);
+
+	public static void writeToTestFile(String text) {
+		// Print to text file
+		FileWriter out = null;
+		try {
+			out = new FileWriter("/tmp/store/test.txt", true);
+			out.write(text);
+			if (out != null) {
+				out.close();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
+	private static void writeToErrorLog(Exception e) {
+		File file = new File("/tmp/store/error.log");
+		PrintStream ps;
+		try {
+			ps = new PrintStream(file);
+			ps.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+	}
 }

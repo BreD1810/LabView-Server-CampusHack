@@ -3,3 +3,6 @@
 /WsServer.class
 /Client.class
 /LifeChecker.class
+/ClientsAdmin.class
+/AddClient.class
+/DetailedClientList.class

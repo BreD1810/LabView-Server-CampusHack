@@ -16,22 +16,36 @@ public class WsServer {
 	public void onOpen(){
 		System.out.println("Open Connection ...");
 		this.writeToTestFile("Open  connection..."+ "\n");
+		//this.writeToTestFile(WebClient.logArrayList());
 	}
 	
 	@OnClose
 	public void onClose(){
-		System.out.println("Close Connection ... "+machineName);
 		this.writeToTestFile("Close connection..." + machineName + "\n");
+		//this.writeToTestFile(WebClient.logArrayList());
+		
+		Client cl = WebClient.getClientByName(machineName);
+		if(cl!=null) {
+			cl.setStatus(0);
+			this.writeToTestFile("Client found \n" + cl.getMachineName() + ", and status=" + cl.getStatus());
+			cl.writeLog();
+		}
+		else {
+			this.writeToTestFile("Client machine name not found: " + machineName + "\n");
+		}
 	}
 	
 	@OnMessage
 	public String onMessage(String machineName) throws IOException{
 		this.machineName=machineName;
-		System.out.println("Message from the client: " + machineName);
+		if(WebClient.clientList==null||WebClient.clientList.isEmpty()) {
+			this.writeToTestFile("EMPTY ARRAY LIST \n");
+		}
 		Client cl = WebClient.getClientByName(machineName);
 		if(cl!=null) {
 			cl.setStatus(1);
-			this.writeToTestFile("Client found \n" + cl.getMachineName() + ", and status=" + cl.getStatus());
+			this.writeToTestFile("Client found " + cl.getMachineName() + ", and status=" + cl.getStatus() + "\n");
+			cl.writeLog();
 		}
 		else {
 			this.writeToTestFile("Client machine name not found: " + machineName + "\n");
@@ -43,7 +57,16 @@ public class WsServer {
 	@OnError
 	public void onError(Throwable e){
 		e.printStackTrace();
-		this.writeToTestFile("Error encountered inside onError");
+		this.writeToTestFile("\nError encountered inside onError\n");
+		Client cl = WebClient.getClientByName(machineName);
+		if(cl!=null) {
+			cl.setStatus(0);
+			this.writeToTestFile("Client found " + cl.getMachineName() + ", and status=" + cl.getStatus() + "\n");
+		}
+		else {
+			this.writeToTestFile("Client machine name not found: " + machineName + "\n");
+		}
+
 	}
 	
 	private void writeToTestFile(String text) {
