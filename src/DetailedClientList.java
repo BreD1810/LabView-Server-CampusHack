@@ -29,8 +29,10 @@ public class DetailedClientList extends HttpServlet {
 			throws ServletException, IOException {
 		String s = "";
 		if (!WebClient.clientList.isEmpty()) {
-			for (Client cl : WebClient.clientList.get(request.getParameter("labNumber"))) {
-				s += cl.toLongString() + System.lineSeparator();
+			for(String key: WebClient.clientList.keySet()) {
+				for(Client cl: WebClient.clientList.get(key)) {
+					s += key +"," + cl.toLongString() + System.lineSeparator();
+				}
 			}
 		}
 		response.setContentType("text/plain;charset=UTF-8");

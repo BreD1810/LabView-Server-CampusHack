@@ -49,7 +49,7 @@ public class AddClient extends HttpServlet {
 		}	
 		
 		WebClient.writeToTestFile("At end of serve, " + cl.toString() +"\n");
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		response.getWriter().append("Successfully added client!").append(request.getContextPath());
 	}
 
 	/**
