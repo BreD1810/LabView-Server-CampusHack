@@ -17,6 +17,7 @@ public class Client {
 	private int status;
 
 	public Client() {
+		
 	}
 
 	public Client(int id, String machineName) {
@@ -62,8 +63,13 @@ public class Client {
 		String l = getLog();
 		String[] lines = l.split("\n");
 		String cleanLog = "";
-		for(int i=1;i<lines.length;i++) {
+		int j=0;
+		for(int i=lines.length-1;i>0;i--) {
 			cleanLog += lines[i];
+			j++;
+			if(j>=5) {
+				break;
+			}
 		}
 		return cleanLog;
 	}
@@ -106,7 +112,7 @@ public class Client {
 		FileWriter out = null;
 		try {
 			out = new FileWriter("/tmp/store/logs/" + this.getMachineName() + ".log", true);
-			out.write("Status at " + System.currentTimeMillis() + " is " + this.status + " \n");
+			out.write("\nStatus at timestamp: " + System.currentTimeMillis() + " is : " + this.status + " ;");
 			if (out != null) {
 				out.close();
 			}
