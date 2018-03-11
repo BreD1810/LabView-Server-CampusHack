@@ -1,7 +1,10 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -67,9 +70,7 @@ public class WebClient extends HttpServlet {
 						//Add a client to the lab/Create new lab
 						if(WebClient.clientList.containsKey(lab))
 						{
-							ArrayList<Client> tempClientList = WebClient.clientList.get(lab);
-							tempClientList.add(cl);
-							WebClient.clientList.put(lab, tempClientList);
+							WebClient.clientList.get(lab).add(cl);
 						}else {
 							ArrayList<Client> tempClientList = new ArrayList<Client>();
 							tempClientList.add(cl);

@@ -1,7 +1,7 @@
-
-
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -29,13 +29,25 @@ public class AddClient extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		WebClient.writeToTestFile("Tryinig to add client \n");
+		String labName = request.getParameter("labNumber");
 		WebClient.writeToTestFile(request.getParameter("id")+"\n");
 		WebClient.writeToTestFile(request.getParameter("name")+"\n");
-		WebClient.writeToTestFile(request.getParameter("labNumber")+"\n");
+		WebClient.writeToTestFile(labName+"\n");
 		Client cl = new Client(Integer.valueOf(request.getParameter("id")), request.getParameter("name"));
 		cl.setStatus(0);
-		writeToClientList(cl, request.getParameter("labNumber"));
-		WebClient.clientList.get(request.getParameter("labNumber")).add(cl);
+		
+		writeNewLab(labName);
+		writeToClientList(cl, labName);
+		
+		if(WebClient.clientList.containsKey(labName))
+		{
+			WebClient.clientList.get(labName).add(cl);
+		}else {
+			ArrayList<Client> tempClientList = new ArrayList<Client>();
+			tempClientList.add(cl);
+			WebClient.clientList.put(labName, tempClientList);
+		}	
+		
 		WebClient.writeToTestFile("At end of serve, " + cl.toString() +"\n");
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
@@ -58,6 +70,32 @@ public class AddClient extends HttpServlet {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private void writeNewLab(String labName) {
+		String filePath = "/tmp/store/"+labName+".txt";
+		File f = new File(filePath);
+		if(!f.exists() || f.isDirectory()) {
+			FileWriter out = null;
+			try {
+				out = new FileWriter(filePath, true);
+				if (out != null) {
+					out.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			FileWriter out2 = null;
+			try {
+				out2 = new FileWriter("/tmp/store/labs.txt", true);
+				out2.write(labName+"\n");
+				if (out2 != null) {
+					out2.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
