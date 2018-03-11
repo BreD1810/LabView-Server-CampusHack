@@ -76,10 +76,10 @@ public class AddClient extends HttpServlet {
 	private void writeNewLab(String labName) {
 		String filePath = "/tmp/store/"+labName+".txt";
 		File f = new File(filePath);
-		if(!f.exists() || f.isDirectory()) {
+		if((!f.exists()) || f.isDirectory()) {
 			FileWriter out = null;
 			try {
-				out = new FileWriter(filePath, true);
+				out = new FileWriter(filePath);
 				if (out != null) {
 					out.close();
 				}
