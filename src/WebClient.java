@@ -1,10 +1,7 @@
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -88,7 +85,6 @@ public class WebClient extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 			WebClient.writeToTestFile(e + "\n");
-			WebClient.writeToErrorLog(e);
 		}
 		WebClient.writeToTestFile("INit done\n");
 	}
@@ -156,17 +152,6 @@ public class WebClient extends HttpServlet {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	private static void writeToErrorLog(Exception e) {
-		File file = new File("/tmp/store/error.log");
-		PrintStream ps;
-		try {
-			ps = new PrintStream(file);
-			ps.close();
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
 		}
 	}
 }
