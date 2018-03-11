@@ -37,7 +37,8 @@ public class WebClient extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		BufferedReader br;
+		WebClient.writeToTestFile("Started init\n");
+		BufferedReader br, br2;
 		try {
 			//Read in the existing clients
 			//br = new BufferedReader(new FileReader("/tmp/store/clientlist.txt"));
@@ -46,41 +47,48 @@ public class WebClient extends HttpServlet {
 			//Get the list of labs
 			ArrayList<String> labs = new ArrayList<String>();
 			br = new BufferedReader(new FileReader("/tmp/store/labs.txt"));
+			WebClient.writeToTestFile("Read file labs.txt, Content : \n");
 			String line = br.readLine();
 			while(line != null) {
+				WebClient.writeToTestFile(line+"\n");
 				labs.add(line);
+				line = br.readLine();
 			}
 			
 			for(String lab:labs) {
-				br = new BufferedReader(new FileReader("/tmp/store/" + lab + ".txt"));
-				br.readLine();
+				br2 = new BufferedReader(new FileReader("/tmp/store/" + lab + ".txt"));
+				WebClient.writeToTestFile("Looping through labs\n");
+				line = br2.readLine();
 				while(line != null) {
-					String[]words = line.split(",");
+					String[] words = line.split(",");
+					WebClient.writeToTestFile(line + "\n");
 					if(words.length>2) {
 						Client cl = new Client(Integer.valueOf(words[0]), words[1]);
 						cl.setStatus(Integer.valueOf(words[2]));
 						long t = Long.valueOf(words[3]);
 						cl.setLastOn(t);
 						//Add a client to the lab/Create new lab
-						if(WebClient.clientList.containsKey(labName))
+						if(WebClient.clientList.containsKey(lab))
 						{
-							ArrayList<Client> tempClientList = WebClient.clientList.get(labName);
+							ArrayList<Client> tempClientList = WebClient.clientList.get(lab);
 							tempClientList.add(cl);
-							WebClient.clientList.put(labName, tempClientList);
+							WebClient.clientList.put(lab, tempClientList);
 						}else {
-							WebClient.clientList.put(labName, new ArrayList<Client>());
+							WebClient.clientList.put(lab, new ArrayList<Client>());
 						}
 					}
-					line = br.readLine();
+					line = br2.readLine();
 				}
+				br2.close();
 			}
-
+			
 			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			WebClient.writeToTestFile(e + "\n");
 			WebClient.writeToErrorLog(e);
 		}
+		WebClient.writeToTestFile("INit done\n");
 	}
 
 	//Not used??
