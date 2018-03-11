@@ -74,7 +74,9 @@ public class WebClient extends HttpServlet {
 							tempClientList.add(cl);
 							WebClient.clientList.put(lab, tempClientList);
 						}else {
-							WebClient.clientList.put(lab, new ArrayList<Client>());
+							ArrayList<Client> tempClientList = new ArrayList<Client>();
+							tempClientList.add(cl);
+							WebClient.clientList.put(lab, tempClientList);
 						}
 					}
 					line = br2.readLine();
@@ -101,7 +103,7 @@ public class WebClient extends HttpServlet {
 //	}
 
 	public static Client getClientByName(String machineName) {
-		for (Client cl : WebClient.clientList.get(labName)) {
+		for (Client cl : WebClient.clientList.get(WebClient.labName)) {
 			if (cl.getMachineName().equals(machineName)) {
 				return cl;
 			}
@@ -118,9 +120,9 @@ public class WebClient extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String s = "";
-		labName = request.getParameter("labNumber");
-		if (!WebClient.clientList.get(labName).isEmpty()) {
-			for (Client cl : WebClient.clientList.get(labName)) {
+		WebClient.labName = request.getParameter("labNumber");
+		if (!WebClient.clientList.get(WebClient.labName).isEmpty()) {
+			for (Client cl : WebClient.clientList.get(WebClient.labName)) {
 				s += cl.toString() + System.lineSeparator();
 			}
 		}
