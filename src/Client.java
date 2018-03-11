@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,7 +18,7 @@ public class Client {
 	private int status;
 
 	public Client() {
-		
+
 	}
 
 	public Client(int id, String machineName) {
@@ -49,33 +50,35 @@ public class Client {
 	public void setLastOn(Date lastOn) {
 		this.lastOn = lastOn;
 	}
-	
+
 	public void setLastOn(long milliseconds) {
 		Date date = new Date(milliseconds);
 		this.setLastOn(date);
 	}
-	
+
 	public long getLastOnMilliSeconds() {
 		return this.getLastOn().getTime();
 	}
-	
+
 	public String getCleanLog() {
 		String l = getLog();
 		String[] lines = l.split("\n");
 		String cleanLog = "";
-		int j=0;
-		for(int i=lines.length-1;i>0;i--) {
-			cleanLog += lines[i];
+		int j = 0;
+		for (int i = lines.length - 1; i > 0; i--) {
+			if (!lines[i].isEmpty()) {
+				cleanLog += lines[i] + "\n";
+			}
 			j++;
-			if(j>=5) {
+			if (j >= 5) {
 				break;
 			}
 		}
 		return cleanLog;
 	}
-	
+
 	public String getLog() {
-		
+
 		BufferedReader br;
 		String contents = "";
 		try {
@@ -91,17 +94,20 @@ public class Client {
 			contents = sb.toString();
 			br.close();
 
-		}catch(IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return contents;
 	}
 
 	public void createLogFile() {
-		List<String> lines = Arrays.asList(this.getId() + " | " + this.getMachineName() + " | " + this.getStatus() + " | " + this.getLastOnMilliSeconds()+"\n");
-		Path file = Paths.get("/tmp/store/logs/"+this.getMachineName()+".log");
+		String filePath = "/tmp/store/logs/" + this.getMachineName() + ".log";
+		Path path = Paths.get(filePath);
+		File f = new File(filePath);
+		if(!f.exists() || f.isDirectory()) return;
+		List<String> lines = Arrays.asList("ID: " + this.getId() + " | Name: " + this.getMachineName() + "\n");
 		try {
-			Files.write(file, lines, Charset.forName("UTF-8"));
+			Files.write(path, lines, Charset.forName("UTF-8"));
 		} catch (IOException e) {
 			e.printStackTrace();
 			WebClient.writeToTestFile(e.toString());
@@ -111,8 +117,10 @@ public class Client {
 	public void writeLog() {
 		FileWriter out = null;
 		try {
+			Date date = new Date(System.currentTimeMillis());
 			out = new FileWriter("/tmp/store/logs/" + this.getMachineName() + ".log", true);
-			out.write("\nStatus at timestamp: " + System.currentTimeMillis() + " is : " + this.status + " ;");
+			out.write("\nStatus at timestamp millis: " + System.currentTimeMillis() + " or date : " + date.toString()
+					+ " was : " + this.getStatus() + " ;");
 			if (out != null) {
 				out.close();
 			}
@@ -133,13 +141,12 @@ public class Client {
 	public String toString() {
 		return this.getMachineName() + "," + this.getStatus();
 	}
-	
+
 	public String toMediumString() {
 		return this.getId() + "," + this.toString() + "," + this.getLastOnMilliSeconds();
 	}
 
-
 	public String toLongString() {
-		return this.getId() + "," + this.toString() + "," + this.getLastOn() + "," + this.getCleanLog();
+		return this.getId() + "," + this.toString() + "," + this.getLastOn() + ",\n" + this.getCleanLog();
 	}
 }
