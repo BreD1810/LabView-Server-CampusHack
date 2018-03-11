@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class LogFile
+ * This class provides a log file for a Client.
  */
 @WebServlet(name = "/logfile", urlPatterns = "/logfile", loadOnStartup = 1, description = "/logfile")
 public class LogFile extends HttpServlet {

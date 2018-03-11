@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -16,13 +17,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class HelloWorld
+ * This class provides an interface to find the clients.
  */
 @WebServlet(name = "/clientlist", urlPatterns = "/clientlist", loadOnStartup = 1, description = "/clientlist")
 public class WebClient extends HttpServlet {
-	public static ArrayList<Client> clientList = new ArrayList<Client>();
+	//public static ArrayList<Client> clientList = new ArrayList<Client>();
+	public static HashMap<String, ArrayList<Client>> clientList = new HashMap<>();
 	private static final long serialVersionUID = 1L;
-
+	private static String labName;
+	
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -31,27 +34,47 @@ public class WebClient extends HttpServlet {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		BufferedReader br;
 		try {
-			br = new BufferedReader(new FileReader("/tmp/store/clientlist.txt"));
+			//Read in the existing clients
+			//br = new BufferedReader(new FileReader("/tmp/store/clientlist.txt"));
+			//String line = br.readLine();
+			
+			//Get the list of labs
+			ArrayList<String> labs = new ArrayList<String>();
+			br = new BufferedReader(new FileReader("/tmp/store/labs.txt"));
 			String line = br.readLine();
-
-			while (line != null) {
-				String[] words = line.split(",");
-				if (words.length > 2) {
-					Client cl = new Client();
-					cl.setId(Integer.valueOf(words[0]));
-					cl.setMachineName(words[1]);
-					cl.setStatus(Integer.valueOf(words[2]));
-					long t = Long.valueOf(words[3]);
-					cl.setLastOn(t);
-					cl.createLogFile();
-					WebClient.clientList.add(cl);
-				}
-				line = br.readLine();
+			while(line != null) {
+				labs.add(line);
 			}
+			
+			for(String lab:labs) {
+				br = new BufferedReader(new FileReader("/tmp/store/" + lab + ".txt"));
+				br.readLine();
+				while(line != null) {
+					String[]words = line.split(",");
+					if(words.length>2) {
+						Client cl = new Client(Integer.valueOf(words[0]), words[1]);
+						cl.setStatus(Integer.valueOf(words[2]));
+						long t = Long.valueOf(words[3]);
+						cl.setLastOn(t);
+						//Add a client to the lab/Create new lab
+						if(WebClient.clientList.containsKey(labName))
+						{
+							ArrayList<Client> tempClientList = WebClient.clientList.get(labName);
+							tempClientList.add(cl);
+							WebClient.clientList.put(labName, tempClientList);
+						}else {
+							WebClient.clientList.put(labName, new ArrayList<Client>());
+						}
+					}
+					line = br.readLine();
+				}
+			}
+
 			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -60,16 +83,17 @@ public class WebClient extends HttpServlet {
 		}
 	}
 
-	public static String logArrayList() {
-		String s = "";
-		for (Client cl : WebClient.clientList) {
-			s += cl.toString() + "\n";
-		}
-		return s;
-	}
+	//Not used??
+//	public static String logArrayList() {
+//		String s = "";
+//		for (Client cl : WebClient.clientList) {
+//			s += cl.toString() + "\n";
+//		}
+//		return s;
+//	}
 
 	public static Client getClientByName(String machineName) {
-		for (Client cl : WebClient.clientList) {
+		for (Client cl : WebClient.clientList.get(labName)) {
 			if (cl.getMachineName().equals(machineName)) {
 				return cl;
 			}
@@ -82,16 +106,19 @@ public class WebClient extends HttpServlet {
 	 *      response)
 	 */
 
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String s = "";
-		if (!WebClient.clientList.isEmpty()) {
-			for (Client cl : WebClient.clientList) {
+		labName = request.getParameter("labNumber");
+		if (!WebClient.clientList.get(labName).isEmpty()) {
+			for (Client cl : WebClient.clientList.get(labName)) {
 				s += cl.toString() + System.lineSeparator();
 			}
 		}
 		response.setContentType("text/plain;charset=UTF-8");
 
+		//Send a list of clients
 		ServletOutputStream sout = response.getOutputStream();
 		sout.print(s);
 
@@ -104,7 +131,7 @@ public class WebClient extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		//Instantly create a response
 		doGet(request, response);
 	}
 

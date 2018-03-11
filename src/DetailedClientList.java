@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class DetailedClientList
+ * This class gives a more detailed version of WebClient.java.
  */
 @WebServlet(name = "/detailedclientlist", urlPatterns = "/detailedclientlist", loadOnStartup = 1, description = "/detailedclientlist")
 public class DetailedClientList extends HttpServlet {
@@ -29,7 +29,7 @@ public class DetailedClientList extends HttpServlet {
 			throws ServletException, IOException {
 		String s = "";
 		if (!WebClient.clientList.isEmpty()) {
-			for (Client cl : WebClient.clientList) {
+			for (Client cl : WebClient.clientList.get(request.getParameter("labNumber"))) {
 				s += cl.toLongString() + System.lineSeparator();
 			}
 		}

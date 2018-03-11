@@ -7,10 +7,14 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.server.ServerEndpoint;
 
+/**
+ * This class accepts new clients, and determines who is online.
+ */
+
 @ServerEndpoint("/websocketendpoint")
 public class WsServer {
 	
-	public String machineName="";
+	private String machineName="";
 	
 	@OnOpen
 	public void onOpen(){

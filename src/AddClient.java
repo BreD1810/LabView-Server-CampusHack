@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class ClientsAdmin
+ * This class allows a user to be added through labview.me/admin
  */
 @WebServlet(name = "/addclient", urlPatterns = "/addclient", loadOnStartup = 1, description = "/addclient")
 public class AddClient extends HttpServlet {
@@ -31,14 +31,11 @@ public class AddClient extends HttpServlet {
 		WebClient.writeToTestFile("Tryinig to add client \n");
 		WebClient.writeToTestFile(request.getParameter("id")+"\n");
 		WebClient.writeToTestFile(request.getParameter("name")+"\n");
-		Client cl = new Client();
-		cl.setId(Integer.valueOf(request.getParameter("id")));
-		cl.setMachineName(request.getParameter("name"));
-		cl.setLastOn(System.currentTimeMillis());
+		WebClient.writeToTestFile(request.getParameter("labNumber")+"\n");
+		Client cl = new Client(Integer.valueOf(request.getParameter("id")), request.getParameter("name"));
 		cl.setStatus(0);
-		cl.createLogFile();
-		writeToClientList(cl);
-		WebClient.clientList.add(cl);
+		writeToClientList(cl, request.getParameter("labNumber"));
+		WebClient.clientList.get(request.getParameter("labNumber")).add(cl);
 		WebClient.writeToTestFile("At end of serve, " + cl.toString() +"\n");
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
@@ -51,10 +48,10 @@ public class AddClient extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void writeToClientList(Client cl) {
+	private void writeToClientList(Client cl, String lab) {
         FileWriter out = null;
 		try {
-			out = new FileWriter("/tmp/store/clientlist.txt", true);
+			out = new FileWriter("/tmp/store/"+lab+".txt", true);
 			out.write(cl.toMediumString()+"\n");
 			if (out != null) {
 				out.close();

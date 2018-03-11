@@ -10,20 +10,22 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * This class represents a client on the network.
+ *
+ */
 public class Client {
 	private int id;
 	private String machineName;
 	private Date lastOn;
 	private int status;
 
-	public Client() {
-		
-	}
 
 	public Client(int id, String machineName) {
-		this();
 		setId(id);
 		setMachineName(machineName);
+		setLastOn(System.currentTimeMillis());
+		createLogFile();
 	}
 
 	public int getId() {
@@ -59,7 +61,7 @@ public class Client {
 		return this.getLastOn().getTime();
 	}
 	
-	public String getCleanLog() {
+	private String getCleanLog() {
 		String l = getLog();
 		String[] lines = l.split("\n");
 		String cleanLog = "";
@@ -97,7 +99,7 @@ public class Client {
 		return contents;
 	}
 
-	public void createLogFile() {
+	private void createLogFile() {
 		List<String> lines = Arrays.asList(this.getId() + " | " + this.getMachineName() + " | " + this.getStatus() + " | " + this.getLastOnMilliSeconds()+"\n");
 		Path file = Paths.get("/tmp/store/logs/"+this.getMachineName()+".log");
 		try {
