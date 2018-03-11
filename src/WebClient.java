@@ -45,7 +45,7 @@ public class WebClient extends HttpServlet {
 					cl.setId(Integer.valueOf(words[0]));
 					cl.setMachineName(words[1]);
 					cl.setStatus(Integer.valueOf(words[2]));
-					long t = Integer.valueOf(words[3])*1000;
+					long t = Long.valueOf(words[3]);
 					cl.setLastOn(t);
 					cl.createLogFile();
 					WebClient.clientList.add(cl);

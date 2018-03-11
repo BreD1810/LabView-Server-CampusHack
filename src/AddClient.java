@@ -55,7 +55,7 @@ public class AddClient extends HttpServlet {
         FileWriter out = null;
 		try {
 			out = new FileWriter("/tmp/store/clientlist.txt", true);
-			out.write(cl.toLongString()+"\n");
+			out.write(cl.toMediumString()+"\n");
 			if (out != null) {
 				out.close();
 			}

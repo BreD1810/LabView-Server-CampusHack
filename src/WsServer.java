@@ -14,7 +14,6 @@ public class WsServer {
 	
 	@OnOpen
 	public void onOpen(){
-		System.out.println("Open Connection ...");
 		this.writeToTestFile("Open  connection..."+ "\n");
 		//this.writeToTestFile(WebClient.logArrayList());
 	}
@@ -27,6 +26,7 @@ public class WsServer {
 		Client cl = WebClient.getClientByName(machineName);
 		if(cl!=null) {
 			cl.setStatus(0);
+			cl.setLastOn(System.currentTimeMillis());
 			this.writeToTestFile("Client found \n" + cl.getMachineName() + ", and status=" + cl.getStatus());
 			cl.writeLog();
 		}

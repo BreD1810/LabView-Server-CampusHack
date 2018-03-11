@@ -57,7 +57,17 @@ public class Client {
 	public long getLastOnMilliSeconds() {
 		return this.getLastOn().getTime();
 	}
-
+	
+	public String getCleanLog() {
+		String l = getLog();
+		String[] lines = l.split("\n");
+		String cleanLog = "";
+		for(int i=1;i<lines.length;i++) {
+			cleanLog += lines[i];
+		}
+		return cleanLog;
+	}
+	
 	public String getLog() {
 		
 		BufferedReader br;
@@ -117,8 +127,13 @@ public class Client {
 	public String toString() {
 		return this.getMachineName() + "," + this.getStatus();
 	}
+	
+	public String toMediumString() {
+		return this.getId() + "," + this.toString() + "," + this.getLastOnMilliSeconds();
+	}
+
 
 	public String toLongString() {
-		return this.getId() + "," + this.toString() + "," + this.getLastOn() + "," + this.getLog();
+		return this.getId() + "," + this.toString() + "," + this.getLastOn() + "," + this.getCleanLog();
 	}
 }
